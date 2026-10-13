@@ -376,7 +376,8 @@ def summarize(runs):
 # Plotting helpers
 # ----------------------------------------------------------------------
 def plot_curves(summary, episodes, fname, title_suffix='', window=50):
-    fig, axes = plt.subplots(1, 3, figsize=(19, 5.2))
+    # 纵向三行布局：每个子图在 Word 中可占满页宽，约为横排的 3 倍大
+    fig, axes = plt.subplots(3, 1, figsize=(7, 11))
     x = np.arange(episodes)
     for name, agg in summary.items():
         spec = ALGO_SPECS[name]
@@ -416,7 +417,7 @@ def plot_curves(summary, episodes, fname, title_suffix='', window=50):
 
     for ax in axes:
         ax.grid(alpha=0.3)
-        ax.legend(fontsize=8, loc='best')
+        ax.legend(fontsize=9, loc='best')
     fig.tight_layout()
     fig.savefig(fname, dpi=150)
     plt.close(fig)
@@ -427,7 +428,9 @@ def plot_final_bars(summary, fname):
     labels = [ALGO_SPECS[n]['title'] for n in names]
     colors = [ALGO_SPECS[n]['color'] for n in names]
 
-    fig, axes = plt.subplots(1, 4, figsize=(19, 4.6))
+    # 2x2 布局：每个子图在 Word 中约为横排的 2 倍大
+    fig, axes = plt.subplots(2, 2, figsize=(8, 7))
+    axes = np.asarray(axes).ravel()
     stats = [
         ('final_reward', '最后100回合平均回报', None),
         ('final_success', '最后100回合成功率', (0, 1.05)),
@@ -438,14 +441,14 @@ def plot_final_bars(summary, fname):
         vals = [summary[n][key] for n in names]
         bars = ax.bar(range(len(names)), vals, color=colors)
         ax.set_xticks(range(len(names)))
-        ax.set_xticklabels(labels, rotation=35, ha='right', fontsize=8)
+        ax.set_xticklabels(labels, rotation=35, ha='right', fontsize=10)
         ax.set_title(title)
         if ylim:
             ax.set_ylim(*ylim)
         for b, v in zip(bars, vals):
             if not np.isnan(v):
                 ax.text(b.get_x() + b.get_width() / 2, v, f'{v:.2f}',
-                        ha='center', va='bottom', fontsize=7)
+                        ha='center', va='bottom', fontsize=8)
         ax.grid(alpha=0.3, axis='y')
     fig.tight_layout()
     fig.savefig(fname, dpi=150)
@@ -598,7 +601,8 @@ def experiment_overestimation(probe_curves, episodes, seeds, outdir, path, v_sta
 def experiment_alpha(episodes, seeds, outdir):
     print(f"\n=== 参数实验: 学习率 α (Q-Learning / SARSA / Expected SARSA) ===")
     alphas = [0.05, 0.1, 0.3, 0.6]
-    fig, axes = plt.subplots(1, 3, figsize=(18, 5.2))
+    # 纵向三行布局，放大每个子图
+    fig, axes = plt.subplots(3, 1, figsize=(7, 11))
     for ax, name in zip(axes, ['q_learning', 'sarsa', 'expected_sarsa']):
         for a in alphas:
             runs = [train_one(name, episodes, s, overrides={'learning_rate': a})[0]
@@ -612,7 +616,7 @@ def experiment_alpha(episodes, seeds, outdir):
         ax.set_title(f"{ALGO_SPECS[name]['title']}: 学习率的影响")
         ax.set_xlabel('回合'); ax.set_ylabel('平均回报 (MA50)')
         ax.axhline(94, color='k', ls='--', lw=1, alpha=0.5)
-        ax.grid(alpha=0.3); ax.legend(fontsize=9)
+        ax.grid(alpha=0.3); ax.legend(fontsize=10)
     fig.tight_layout()
     fig.savefig(os.path.join(outdir, 'fig5_alpha_sweep.png'), dpi=150)
     plt.close(fig)
