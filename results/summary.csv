@@ -1,0 +1,9 @@
+﻿algorithm,category,final_reward,final_reward_std,final_success,eval_success,eval_steps,eval_return,eval_optimal,episodes_to_90
+Q-Learning,value,92.03,1.32,0.99,1.00,7.00,94.00,1.00,189.00
+SARSA,value,91.38,1.37,0.99,1.00,7.80,93.20,0.60,185.80
+Expected SARSA,value,91.56,1.59,0.99,1.00,8.00,93.00,0.50,181.10
+Double Q-Learning,value,91.52,1.63,0.99,1.00,7.80,93.20,0.60,193.15
+Sarsa(λ=0.9),value,90.69,1.59,0.99,1.00,8.90,92.10,0.10,171.15
+MC Control (on-policy),policy,52.54,52.25,0.73,0.80,8.50,63.80,0.35,556.35
+MC Control (off-policy WIS),policy,-14.56,38.59,0.28,0.45,8.78,11.00,0.05,nan
+REINFORCE + baseline,policy,77.85,43.03,0.90,0.90,8.44,78.20,0.25,289.33

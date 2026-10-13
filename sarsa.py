@@ -5,12 +5,11 @@ from collections import defaultdict
 
 class SARSAAgent:
     """
-    SARSA agent implementation.
+    SARSA agent implementation (on-policy TD control).
 
-    TODO: Implement the following methods:
-    1. learn() - implement the SARSA update rule
-    2. Optional: Modify the exploration strategy
-    3. Optional: Add any additional methods you think are useful
+    Implements the SARSA update rule:
+    1. learn() - SARSA update (see below)
+    2. Epsilon-greedy exploration with decay
 
     The SARSA update rule is:
     Q(s,a) = Q(s,a) + α * [r + γ * Q(s',a') - Q(s,a)]
@@ -75,8 +74,6 @@ class SARSAAgent:
         """
         Update Q-table using SARSA update rule.
 
-        TODO: Implement this method!
-
         Args:
             state: Current state
             action: Action taken
@@ -84,19 +81,22 @@ class SARSAAgent:
             next_state: Next state
             next_action: Action to be taken in next state
         """
-        # TODO: Get current Q-value for (state, action)
+        # Get current Q-value for (state, action)
         current_q = self.q_table[state][action]
 
-        # TODO: Get Q-value for (next_state, next_action)
+        # Get Q-value for (next_state, next_action)
         # This is the key difference from Q-learning:
         # SARSA uses Q(s',a') instead of max_a' Q(s',a')
-        # YOUR CODE HERE
-        next_q = 0  # Replace this with your code
+        # If next_action is None, the next state is terminal (no bootstrap)
+        if next_action is not None:
+            next_q = self.q_table[next_state][next_action]
+        else:
+            next_q = 0
 
-        # TODO: Compute the SARSA update
+        # Compute the SARSA update (on-policy TD target)
         # Q(s,a) = Q(s,a) + α * [r + γ * Q(s',a') - Q(s,a)]
-        # YOUR CODE HERE
-        new_q = current_q  # Replace this with your code
+        td_target = reward + self.gamma * next_q
+        new_q = current_q + self.lr * (td_target - current_q)
 
         # Update Q-table
         self.q_table[state][action] = new_q
@@ -108,6 +108,12 @@ class SARSAAgent:
     def set_epsilon(self, epsilon):
         """Set exploration rate"""
         self.epsilon = max(epsilon, self.epsilon_min)
+
+    def get_greedy_action(self, state, valid_actions):
+        """Greedy action w.r.t. the current Q-table (used for evaluation)."""
+        q_values = self.q_table[state]
+        valid_q_values = {action: q_values[action] for action in valid_actions}
+        return max(valid_q_values.keys(), key=lambda x: valid_q_values[x])
 
     def save_q_table(self, filename):
         """Save Q-table to file"""
